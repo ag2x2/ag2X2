@@ -23,7 +23,7 @@ Code repository for **Ag2x2: A Robust Agent-Agnostic Visual Representation Boost
    - ``` bash
      cd repre_trainer
    - Run `train_ddp.py` to train our model on multiple GPUs in parallel, or run `train.py` to train on a single GPU.
-2. Modify `exp_name` in `repre_trainer/cfgs/scratch.yml` to save the model to the location you specify.
+2. Modify `exp_name` in `repre_trainer/cfgs/scratch.yml` and save the model to the location you specify.
 3. Please download our checkpoint [here](https://1drv.ms/u/s!AtoAqxZ1DxQscLqjqks969dqUcY?e=nLJFe2).
 
 ## Bimanual Skills
