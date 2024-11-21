@@ -17,7 +17,6 @@ import torch
 from termcolor import colored, cprint
 
 class CloseDoorOutward(BaseTask):
-    #TODO: remain to be completed and fill it with a task description
 
     def __init__(self, cfg, sim_params, physics_engine, device_type, device_id, camera, headless):
         self.cfg = cfg
@@ -93,14 +92,11 @@ class CloseDoorOutward(BaseTask):
         print("Obs type:", self.obs_type)
         if self.act_type in ['robot_joint_pose']:
             self.num_obs_dict = {
-                "robot_state": 8 * 4 + 1,  # 8*2 for each hand, two hands, +1 ?
-                "full_state": 20 * 2 + 1,  # 12*2 for both hands, 1 for progress, +1+1 for each hand's attached
+                "full_state": 20 * 2 + 1,
             }
         else:
             self.num_obs_dict = {
-                "robot_state": 8 * 4 + 1,
-                # "full_state": 9 + 9 + 1 + 1,  #* (9 + 9) for robot joint pos and vel, (1 + 1) for manipulated object pos and vel
-                "full_state": 8 * 2 + 1 + 1 + 1,  # num_dofs = 8 
+                "full_state": 8 * 2 + 1 + 1 + 1,  # num_dofs = 8
             }
         self.cfg["env"]["numObservations"] = self.num_obs_dict[self.obs_type]
         if self.cfg["env"]["numObservations"] is None:
@@ -202,7 +198,7 @@ class CloseDoorOutward(BaseTask):
             goal_path = f"./tasks/{task_envname}/goals_image/{task_skillname}@{self.camera}@woa.png"
             goal_image = imageio.imread(goal_path)
             goal_image = torch.tensor(goal_image.astype(np.float32) / 255.0, dtype=torch.float32, device=self.device)
-        elif self.repre_type in ['ag2manip']:
+        elif self.repre_type in ['ag2x2']:
             goal_path = f"./tasks/{task_envname}/goals_image/{task_skillname}@{self.camera}@woa.png"
             goal_image = imageio.imread(goal_path)
             goal_image = torch.tensor(goal_image.astype(np.float32) / 255.0, dtype=torch.float32, device=self.device)
@@ -210,7 +206,7 @@ class CloseDoorOutward(BaseTask):
             pass
         else:
             raise NotImplementedError("Not implemented representation type: ", self.repre_type)
-        if self.repre_type in ['r3m', 'vip', 'ag2manip']: 
+        if self.repre_type in ['r3m', 'vip', 'ag2x2']: 
             goal_hand = world2screen(torch.tensor([[0.09, 0.07, 0.5], [0.09, -0.07, 0.5]]).unsqueeze(0).to(self.device),
                     self.view_m, self.projection_m,
                     self.camera_w)  # [1,2,3] -> [1,2,2]
@@ -226,7 +222,7 @@ class CloseDoorOutward(BaseTask):
             raise NotImplementedError("Not implemented representation type: ", self.repre_type)
         
         #* init representation model
-        if self.repre_type in ['r3m', 'vip', 'ag2manip']: 
+        if self.repre_type in ['r3m', 'vip', 'ag2x2']: 
             repre_model_name = self.cfg["repre"]["model"]
             Module = import_module(f"repres.{repre_model_name.lower()}")
             RepreModel = getattr(Module, repre_model_name)
@@ -310,7 +306,7 @@ class CloseDoorOutward(BaseTask):
                 robot_another_asset_file = cfg_asset["agent"]["franka1"]
             else:
                 raise NotImplementedError
-        elif self.repre_type in ['ag2manip', 'r3m', 'vip']:
+        elif self.repre_type in ['ag2x2', 'r3m', 'vip']:
             if self.act_type == 'dummy_interaction_sphere':
                 robot_asset_file = cfg_asset["agent"]["sphere-wovis"]
                 robot_another_asset_file = cfg_asset["agent"]["sphere-wovis1"]
@@ -458,8 +454,8 @@ class CloseDoorOutward(BaseTask):
         
         #* set camera sensor porps and pose
         self.camera_props = gymapi.CameraProperties()
-        self.camera_props.width = 256 #224
-        self.camera_props.height = 256 #224
+        self.camera_props.width = 224
+        self.camera_props.height = 224
         self.camera_props.enable_tensors = True
         self.camera_props.use_collision_geometry = False
         if self.repre_type in ['handcrafted','eureka']:
@@ -680,7 +676,7 @@ class CloseDoorOutward(BaseTask):
 
     def compute_reward(self, actions):
         # support hand-crafted reward
-        if self.repre_type in ["r3m", "ag2manip", "vip", ]:
+        if self.repre_type in ["r3m", "ag2x2", "vip", ]:
             self.gym.render_all_camera_sensors(self.sim)
             self.gym.start_access_image_tensors(self.sim)
             camera_images = []
@@ -695,7 +691,7 @@ class CloseDoorOutward(BaseTask):
             value, _ = self.repre_model(camera_images, hands)
 
             #* reward shaping for different representation model
-            if self.repre_type in ['r3m', 'ag2manip', 'vip']:
+            if self.repre_type in ['r3m', 'ag2x2', 'vip']:
                 if self.initial_value is None:
                     self.initial_value = value.clone().mean().cpu().item()
                 reward = (1 / self.initial_value) * (self.initial_value - value)
@@ -708,10 +704,7 @@ class CloseDoorOutward(BaseTask):
                 reward = torch.where(reward < 0, torch.exp(reward) - 1, 10 * (torch.exp(2 * reward) - 1))
             else:
                 raise NotImplementedError
-            reward += ((self.is_attached & self.another_is_attached)*torch.ones_like(reward)*0.5)
-        # TODO: to be modified
         elif self.repre_type in ["handcrafted"]:
-            # compute hand-crafted reward for this task
             door_left_dof_pos = self.door_left_dof_pos.clone()
             door_right_dof_pos = self.door_right_dof_pos.clone()
             reward = (3.14-door_right_dof_pos-door_left_dof_pos) / 3.14
@@ -745,8 +738,6 @@ class CloseDoorOutward(BaseTask):
         goal_door_dof_pos = 0
         door_right_dof_pos = self.door_right_dof_pos.clone()
         door_left_dof_pos = self.door_left_dof_pos.clone()
-        print('left', door_left_dof_pos)
-        print('right', door_right_dof_pos)
         achived_goal = (torch.abs(goal_door_dof_pos - door_right_dof_pos) < 0.2) & (torch.abs(goal_door_dof_pos - door_left_dof_pos) < 0.2)
         self.rew_buf = reward.clone()
         self.successes = torch.where(self.successes == 0,   
@@ -845,9 +836,6 @@ class CloseDoorOutward(BaseTask):
                 self.gripper_pos_history.append(self.gripper_pos.squeeze(0).cpu().numpy())
                 self.another_gripper_pos_history.append(self.gripper_another_pos.squeeze(0).cpu().numpy())
                 self.update_smo_metric()
-            print(self.attached_body_handle, self.gripper_pos)#, self.robot_dof_pos)
-            print(self.another_attached_body_handle, self.gripper_another_pos)#, self.robot_another_dof_pos)
-        
         elif self.act_type in ['end_effector_pose', 'robot_joint_pose']:
             self.gripper_pos = torch.zeros((self.num_envs, 3), device=self.device)
             self.gripper_another_pos = torch.zeros((self.num_envs, 3), device=self.device)
@@ -858,14 +846,6 @@ class CloseDoorOutward(BaseTask):
                 self.compute_full_state()
             else:
                 raise NotImplementedError(f"The observation type {self.obs_type} is not implemented yet")
-    
-    def compute_robot_state(self):
-        self.obs_buf[:, :self.num_robot_dofs] = unscale(self.robot_dof_pos, 
-                                            self.robot_dof_lower_limits, self.robot_dof_upper_limits)
-        self.obs_buf[:, self.num_robot_dofs:2*self.num_robot_dofs] = self.vel_obs_scale * self.robot_dof_vel
-        self.obs_buf[:, 2*self.num_robot_dofs:3*self.num_robot_dofs] = unscale(self.robot_another_dof_pos, 
-                                            self.robot_dof_lower_limits, self.robot_dof_upper_limits)
-        self.obs_buf[:, 3*self.num_robot_dofs:4*self.num_robot_dofs] = self.vel_obs_scale * self.robot_another_dof_vel
 
     def compute_full_state(self):
         self.obs_buf[:, :self.num_dofs] = self.dof_states[:, :, 0].clone().detach()
@@ -1058,7 +1038,7 @@ class CloseDoorOutward(BaseTask):
                                                     gymtorch.unwrap_tensor(dof_states),
                                                     gymtorch.unwrap_tensor(another_force_robot_indices), len(another_force_robot_indices))
             #* apply force on objects
-            GLOBAL_FORCES_SCALE = 1000.
+            GLOBAL_FORCES_SCALE = 500.
             dummy_forces = torch.nn.functional.normalize(self.forces, dim=-1)
             dummy_forces = GLOBAL_FORCES_SCALE * self.forces_magnitude * dummy_forces
             rigid_body_forces = torch.zeros((self.num_envs, self.num_rigid_bodies, 3), dtype=torch.float, device=self.device)
