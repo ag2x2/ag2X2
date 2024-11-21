@@ -19,7 +19,7 @@ from datasets.base import DATASET
 @DATASET.register()
 class EpicKitchen(Dataset):
     """ Dataset for representation learning, 
-        training with EPIC-KITCHEN agent-aware/agent-agonostic dataset
+        training with EPIC-KITCHEN agent-aware/agent-agonostic & hand position dataset
     """
     _STR_FRAME_LENGTH = 10
     _train_split = []
@@ -67,7 +67,7 @@ class EpicKitchen(Dataset):
             # return self._getitem_vip(index)
             #! use r3m sample way
             return self._getitem_vip(index)
-        elif self.item_type.lower() in ['r3m', 'ag2manip']:
+        elif self.item_type.lower() in ['r3m', 'ag2x2']:
             return self._getitem_r3m(index)
         else:
             raise NotImplementedError
