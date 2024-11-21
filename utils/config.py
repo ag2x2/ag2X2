@@ -63,22 +63,7 @@ def set_seed(seed, torch_deterministic=False):
 def retrieve_cfg(args, use_rlg_config=False):
     task_env, task_name, repre = args.task.split("@")
     
-    if task_env == 'frankakitchen' and task_name in ['open_slidecabinet', 'close_slidecabinet',
-                                                    'open_hingecabinet', 'close_hingecabinet', 
-                                                    'move_kettle', 'pickup_kettle',
-                                                    'close_microwave', 'open_microwave',
-                                                    'turnon_switch', 'turnoff_switch',]:
-        return os.path.join(args.logdir, f"{task_env}/{task_name}@{args.camera}/{repre}@{args.algo}"), f"cfgs/algo/{args.algo}/config.yaml", f"cfgs/task/{task_env}/{task_name}.yaml", f'cfgs/repre/{repre}/config.yaml'
-    elif task_env == 'partmanip' and task_name in ['pull_wooddrawer', 'push_wooddrawer',
-                                                   'open_dishwasher', 'close_dishwasher',
-                                                   'press_button', 'lift_lid']:
-        return os.path.join(args.logdir, f"{task_env}/{task_name}@{args.camera}/{repre}@{args.algo}"), f"cfgs/algo/{args.algo}/config.yaml", f"cfgs/task/{task_env}/{task_name}.yaml", f'cfgs/repre/{repre}/config.yaml'
-    elif task_env == 'maniskill' and task_name in ['turn_rightfaucet', 'turn_leftfaucet',
-                                                   'open_door', 'close_door',
-                                                   'pickup_cube', 'stack_cube',
-                                                   'pickup_clutterycb', 'insert_peg']:
-        return os.path.join(args.logdir, f"{task_env}/{task_name}@{args.camera}/{repre}@{args.algo}"), f"cfgs/algo/{args.algo}/config.yaml", f"cfgs/task/{task_env}/{task_name}.yaml", f'cfgs/repre/{repre}/config.yaml'
-    elif task_env == 'bidexhands' and task_name in ['open_door_outward', 'open_door_inward', 'open_pen_cap', 'close_scissors', 'lift_pot', 'put_cube_into_drawer', 'put_cube_into_wave', 'lift_sphere', 'push_box', 'swing_cup', 'press_buttons', 'lift_tray', 'sweep_dirt', 'close_door_outward', 'straighten_rope', 'close_door_inward', 'rope11', 'rope12', 'rope13', 'rope21', 'rope22', 'rope23', 'rope31', 'rope32', 'rope33']:
+    if task_env == 'ag2x2' and task_name in ['close_door_outward']:
         return os.path.join(args.logdir, f"{task_env}/{task_name}@{args.camera}/{repre}@{args.algo}"), f"cfgs/algo/{args.algo}/config.yaml", f"cfgs/task/{task_env}/{task_name}.yaml", f'cfgs/repre/{repre}/config.yaml'
     else:
         warn_task_name()
