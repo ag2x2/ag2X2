@@ -41,5 +41,7 @@ Code repository for **Ag2x2: A Robust Agent-Agnostic Visual Representation Boost
 4. Plan with franka robot arms using the saved trajectory:
    ```bash
    python plan.py --task=ag2x2@close_door_outward@ag2x2 --traj_path=logs/ag2x2/close_door_outward@default/ag2x2@ppo.42/absres_best.pkl --pipeline=cpu --algo=ppo --cfg_train=cfgs/algo/ppo/manipulation.yaml --disable_wandb --camera=default
-5. We test our model on 13 tasks, each with 9 runs (3 seeds x 3 camera positions). Check out our 13x9 experiment videos [here](https://1drv.ms/f/s!AtoAqxZ1DxQscVwnE4OF4ndbzTE?e=zg175H).
-6. Additionally, please check out imitation learning training data visualization and the inference video [here](https://1drv.ms/f/s!AtoAqxZ1DxQsggtbiVYByiexQj8p?e=XAaJnU).
+
+## Results Visualization
+1. We test our model on 13 tasks, each with 9 runs (3 seeds x 3 camera positions). Check out our 13x9 experiment videos [here](https://1drv.ms/f/s!AtoAqxZ1DxQscVwnE4OF4ndbzTE?e=zg175H).
+2. Additionally, please check out imitation learning training data visualization and the inference video [here](https://1drv.ms/f/s!AtoAqxZ1DxQsggtbiVYByiexQj8p?e=XAaJnU).
