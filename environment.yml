@@ -70,7 +70,6 @@ dependencies:
       - importlib-metadata==7.0.1
       - importlib-resources==6.1.1
       - iniconfig==1.1.1
-      - isaacgym-stubs==1.0rc4
       - lit==17.0.6
       - loguru==0.7.0
       - markdown==3.5.2
