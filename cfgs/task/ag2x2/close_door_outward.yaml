@@ -32,7 +32,7 @@ env:
   fallDistance: 0.4
   fallPenalty: 0.0
 
-  observationType: "full_state"  # full_state or robot_state
+  observationType: "full_state"
   asymmetric_observations: False
   successTolerance: 0.1
   printNumSuccesses: False
