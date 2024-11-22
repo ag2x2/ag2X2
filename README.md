@@ -4,13 +4,13 @@ Code repository for **Ag2x2: A Robust Agent-Agnostic Visual Representation Boost
 
 ## Environment Setup
 1. Ensure you have the following software installed:
-   - Python >= 3.6.8
+   - Python == 3.6.8
    - Pytorch 1.13.1+cu117
 
 2. Clone the project:
    ```bash
    git clone https://github.com/ag2x2/ag2X2.git
-   cd ag2x2
+   cd ag2X2
 
 3. Create conda environment:
    ```bash
