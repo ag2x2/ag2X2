@@ -3,20 +3,29 @@
 Code repository for **Ag2x2: A Robust Agent-Agnostic Visual Representation Boosts Zero-Shot Learning of Bimanual Robotic Manipulation**.
 
 ## Environment Setup
-1. Ensure you have the following software installed:
-   - Python == 3.6.8
-   - Pytorch 1.13.1+cu117
-
-2. Clone the project:
+1. Clone the project:
    ```bash
    git clone https://github.com/ag2x2/ag2X2.git
    cd ag2X2
-
-3. Create conda environment:
+   
+2. Create a conda environment:
    ```bash
-   conda env create -f environment.yml
+   conda create -n ag2x2 python=3.6.8
+   conda activate ag2x2
 
-4. Install [IsaacGym](https://developer.nvidia.com/isaac-gym) following the official documentation.
+3. Install Pytorch:
+   ```bash
+   pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 -f https://download.pytorch.org/whl/torch_stable.html
+
+4. Install conda dependencies:
+   ```bash
+   conda install --file dependencies.txt -y
+
+5. Install pip requirements:
+   ```bash
+   pip install -r requirements.txt
+   
+6. Install [IsaacGym](https://developer.nvidia.com/isaac-gym) following the official documentation.
    
 ## Visual Representation
 1. Train our visual representation model on EPIC-KITCHEN dataset:
