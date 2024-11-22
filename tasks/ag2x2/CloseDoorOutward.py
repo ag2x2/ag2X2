@@ -1225,9 +1225,8 @@ class CloseDoorOutward(BaseTask):
             self.render()
             self.gym.simulate(self.sim)
             self.gym.fetch_results(self.sim, True)
-        # compute observations, rewards, resets, ...
+        # compute observations
         self.compute_observations()
-        #self.compute_reward(None)
         return self.extras
 
     def render_image(self, env_id=0):
