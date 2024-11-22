@@ -116,8 +116,6 @@ class PPO:
                 assert current_obs.shape[0] == 1, "Saving trajectory only works with one environment"
                 trajectory = []
                 scores = []
-                indicators_right = []
-                indicators_left = []
                 visual_reward = []
                 self.actor_critic.load_state_dict(torch.load(ckpt))
 
@@ -129,8 +127,6 @@ class PPO:
                         current_obs.copy_(next_obs)
                         trajectory.append(self.vec_env.task.get_states())
                         scores.append(infos['success_scores'].cpu().item())
-                        indicators_right.append(infos["indicator_right"].cpu().numpy())
-                        indicators_left.append(infos["indicator_left"].cpu().numpy())
                         visual_reward.append(rews.cpu().numpy())
                         
                     if self.vec_env.task.reset_buf.sum() > 0.:
@@ -141,8 +137,6 @@ class PPO:
                 absres = {
                     'trajectory': trajectory,
                     'scores': scores,
-                    'indicators_right': indicators_right,
-                    'indicators_left': indicators_left,
                     'visual_reward': visual_reward
                 }
                 pickle.dump(absres, open(absres_path, 'wb'))
