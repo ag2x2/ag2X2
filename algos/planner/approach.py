@@ -22,7 +22,7 @@ class APPROACH:
 
     def transfer(self, env_id=0):
         if self.env_name in ['ag2x2@close_door_outward']:
-            quat_default = np.array([0.707, 0, 0, -0.707])
+            quat_default = np.array([0.707, 0.707, 0, 0])
         else:
             raise NotImplementedError
         self.FSM_STATE = 'FREE'
