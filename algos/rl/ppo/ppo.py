@@ -116,12 +116,9 @@ class PPO:
                 assert current_obs.shape[0] == 1, "Saving trajectory only works with one environment"
                 trajectory = []
                 scores = []
-                #indicators_right = []  # TODO
-                #indicators_left = []
-                indicators = []
+                indicators_right = []
+                indicators_left = []
                 visual_reward = []
-                # TODO
-                print(ckpt)
                 self.actor_critic.load_state_dict(torch.load(ckpt))
 
                 self.actor_critic.eval()
@@ -132,17 +129,9 @@ class PPO:
                         current_obs.copy_(next_obs)
                         trajectory.append(self.vec_env.task.get_states())
                         scores.append(infos['success_scores'].cpu().item())
-                        #indicators_right.append(infos["indicator_right"].cpu().numpy())  # TODO
-                        #indicators_left.append(infos["indicator_left"].cpu().numpy())
-                        #indicators.append(infos["indicator"].cpu().numpy())
+                        indicators_right.append(infos["indicator_right"].cpu().numpy())
+                        indicators_left.append(infos["indicator_left"].cpu().numpy())
                         visual_reward.append(rews.cpu().numpy())
-                        
-                        # TODO
-                        #print(self.vec_env.task.get_states()['panda_hand'], self.vec_env.task.get_states()['another_panda_hand'])
-                        #print('scores: ', infos['success_scores'].cpu().item())
-                        #print('right ', infos["indicator_right"].cpu().numpy(), ' left ', infos["indicator_left"].cpu().numpy())
-                        #print('indicator:', infos["indicator"].cpu().numpy())
-                        print('reward:', rews.cpu().numpy())
                         
                     if self.vec_env.task.reset_buf.sum() > 0.:
                         break
@@ -152,9 +141,8 @@ class PPO:
                 absres = {
                     'trajectory': trajectory,
                     'scores': scores,
-                    #'indicators_right': indicators_right,  # TODO
-                    #'indicators_left': indicators_left,
-                    'indicators': indicators,
+                    'indicators_right': indicators_right,
+                    'indicators_left': indicators_left,
                     'visual_reward': visual_reward
                 }
                 pickle.dump(absres, open(absres_path, 'wb'))
