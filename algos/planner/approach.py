@@ -30,8 +30,8 @@ class APPROACH:
         self.execute_traj = []
         for i_step, act in enumerate(self.dummy_traj):
             if act['attached_info_indices'] == -1: 
-                pos = act['panda_hand'][env_id, :3]
-                quat = quat_default
+                pos = act['panda_hand'][env_id, :3] - Rotation.from_quat(quat_default).as_matrix() @ np.array([0, 0, 0.1])
+                quat = act['panda_hand'][env_id, 3:7]
                 attractor_pose = gymapi.Transform()
                 attractor_pose.p = gymapi.Vec3(*pos)
 
@@ -44,7 +44,7 @@ class APPROACH:
                 actor_trans = act['attach_info'][act['attached_info_indices'][env_id]]['object_trans']
                 actor_rot = act['attach_info'][act['attached_info_indices'][env_id]]['object_rot']
                 attach_trans = attached_info['attach_info']['translation']
-                attach_rot = attached_info['attach_info']['rotation_matrix'] @ Rotation.from_euler('xyz', [0., 1.57, 0.]).as_matrix()
+                attach_rot = attached_info['attach_info']['rotation_matrix'] @ Rotation.from_euler('xyz', [1.57, -1.57, -1.57]).as_matrix()
 
                 attach_trans = actor_rot @ attach_trans + actor_trans
                 attach_rot = actor_rot @ attach_rot
@@ -131,8 +131,8 @@ class APPROACH:
         self.execute_traj1 = []
         for i_step, act in enumerate(self.dummy_traj1):
             if act['another_attached_info_indices'] == -1: 
-                pos = act['another_panda_hand'][env_id, :3]
-                quat = quat_default
+                pos = act['another_panda_hand'][env_id, :3] - Rotation.from_quat(quat_default).as_matrix() @ np.array([0, 0, 0.1])
+                quat = act['another_panda_hand'][0, 3:7]
                 attractor_pose = gymapi.Transform()
                 attractor_pose.p = gymapi.Vec3(*pos)
 
@@ -145,7 +145,7 @@ class APPROACH:
                 actor_trans = act['attach_info'][act['another_attached_info_indices'][env_id]]['object_trans']
                 actor_rot = act['attach_info'][act['another_attached_info_indices'][env_id]]['object_rot']
                 attach_trans = attached_info['attach_info']['translation']
-                attach_rot = attached_info['attach_info']['rotation_matrix'] @ Rotation.from_euler('xyz', [0., 1.57, 0.]).as_matrix()
+                attach_rot = attached_info['attach_info']['rotation_matrix'] @ Rotation.from_euler('xyz', [1.57, 1.57, -1.57]).as_matrix()
 
                 attach_trans = actor_rot @ attach_trans + actor_trans
                 attach_rot = actor_rot @ attach_rot
